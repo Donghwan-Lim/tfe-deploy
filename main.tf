@@ -171,10 +171,11 @@ resource "aws_key_pair" "tfe-keypair" {
   key_name   = "${var.prefix}-keypair"
   #public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAxnyAkgOuZKikOax2ZAutclzsG+2geDCUL4FMgoEMrY6qvLDIfV85Hf55gJlZwjzqvcXpg+xdBi4/Zr0kxjzQwlqfn5c4F1XltHs+YFz92ie+KIv++Y4DYhnlea3SrwwyN+eiQu/AKpZWkpAWyJ3Axw4U1RavJKxtlBYPrZXKQ+b4mlpQJopr5lU8jF6Uu61GTNPQ2mN9zQ1QQe93p6dhWyvdirlQ0OW/Hpab6ae+k8HxpoTVre+nuIRS/tBKfD+rNNblXIM2n5Kn4abYzNLyxBTxCJDK+lkUhmuAfC9D9GJR8fbvHaplYhp8/Jz9L0vEZG7/BYq6n8+cRaKNVBwSeQ=="
   public_key = tls_private_key.tfe-priv-key.public_key_openssh
+}
 
-  provisioner "local-exec" {
-    command = "echo '${tls_private_key.tfe-priv-key.private_key_pem}' > ./${var.prefix}-keypair.pem"
-  }
+resource "local_file" "ssh_key" {
+  filename = "${var.prefix}-keypair.pem"
+  content = tls_private_key.tfe-priv-key.private_key_pem
 }
 
 #########Command EXEC###########

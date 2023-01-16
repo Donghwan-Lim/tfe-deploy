@@ -2,10 +2,9 @@ terraform {
   cloud {
     hostname = "app.terraform.io"
     organization = "Insideinfo"
-  }
-
-  workspace {
-    name = "tfe-deploy"
+    workspaces {
+      name = "tfe-deploy"
+    }
   }
 }
 

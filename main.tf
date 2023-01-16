@@ -175,6 +175,7 @@ resource "aws_key_pair" "tfe-keypair" {
 }
 
 #########Command EXEC###########
+/*
   resource "null_resource" "configure_tfe" {
   depends_on = [aws_eip_association.tfe-eip]
 
@@ -197,7 +198,8 @@ resource "aws_key_pair" "tfe-keypair" {
       host        = aws_eip.tfe-eip.public_ip
     }
   }
-}
+}*/
+#########Command EXEC###########
 
 ####################### S3 ############
 resource "aws_s3_bucket" "tfe-s3" {

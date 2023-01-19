@@ -153,6 +153,24 @@ resource "aws_eip_association" "tfe-eip" {
   allocation_id = aws_eip.tfe-eip.id
 }
 
+# Create Volumes
+resource "aws_ebs_volume" "tfe-vols" {
+  availability_zone = aws_subnet.tfe-subnet.availability_zone
+  size              = 100
+  type = "gp3"
+  tags = {
+    Name = "tfe-volumes"
+    environment = "${var.prefix}-Labs"
+  }
+}
+
+# Attach Volumes
+resource "aws_volume_attachment" "ebs_att" {
+  device_name = "/dev/sda"
+  volume_id   = aws_ebs_volume.tfe-vols.id
+  instance_id = aws_instance.tfe-server.id
+}
+
 resource "aws_instance" "tfe-server" {
 
   ami = "ami-035233c9da2fabf52"

@@ -166,7 +166,7 @@ resource "aws_ebs_volume" "tfe-vols" {
 
 # Attach Volumes
 resource "aws_volume_attachment" "ebs_att" {
-  device_name = "/dev/sda"
+  device_name = "/dev/sdb"
   volume_id   = aws_ebs_volume.tfe-vols.id
   instance_id = aws_instance.tfe-server.id
 }

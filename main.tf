@@ -111,11 +111,11 @@ resource "aws_security_group" "tfe-sg" {
   }
 
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     cidr_blocks     = ["0.0.0.0/0"]
-    prefix_list_ids = []
+    #prefix_list_ids = []
   }
 
 #KB Capital Security Setting

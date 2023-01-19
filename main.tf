@@ -118,6 +118,14 @@ resource "aws_security_group" "tfe-sg" {
     #prefix_list_ids = []
   }
 
+   egress {
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+    #prefix_list_ids = []
+  }
+
 #KB Capital Security Setting
 /* 
   egress {

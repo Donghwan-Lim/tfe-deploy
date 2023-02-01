@@ -146,6 +146,10 @@ resource "aws_security_group" "tfe-sg" {
 resource "aws_eip" "tfe-eip" {
   instance = aws_instance.tfe-server.id
   vpc      = true
+  tags = {
+    Name = "tfe-eip"
+    environment = "${var.prefix}-Labs"
+  }
 }
 
 resource "aws_eip_association" "tfe-eip" {

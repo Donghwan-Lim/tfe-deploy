@@ -183,7 +183,7 @@ resource "aws_instance" "tfe-server" {
   key_name = aws_key_pair.tfe-keypair.key_name
   root_block_device {
     volume_type = "gp3"
-    volume_size = 30
+    volume_size = 50
   }
 
   tags = {

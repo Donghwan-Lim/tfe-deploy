@@ -181,6 +181,10 @@ resource "aws_instance" "tfe-server" {
   # security_groups = [ aws_security_group.tfe-sg.id]
   vpc_security_group_ids = [ aws_security_group.tfe-sg.id ]
   key_name = aws_key_pair.tfe-keypair.key_name
+  root_block_device {
+    volume_type = "gp3"
+    volume_size = 30
+  }
 
   tags = {
     Name = "${var.prefix}-server"

@@ -181,7 +181,7 @@ resource "aws_instance" "tfe-server" {
 
   subnet_id = aws_subnet.tfe-subnet.id
   instance_type = var.instance_type1
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   # security_groups = [ aws_security_group.tfe-sg.id]
   vpc_security_group_ids = [ aws_security_group.tfe-sg.id ]
   key_name = aws_key_pair.tfe-keypair.key_name

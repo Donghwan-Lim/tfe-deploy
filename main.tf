@@ -254,16 +254,16 @@ resource "local_file" "ssh_key" {
 #########Command EXEC###########
 
 ####################### S3 ############
-/*
-resource "aws_s3_bucket" "tfe-s3" {
-  bucket = "tfe-s3"
+
+resource "aws_s3_bucket" "tfe-s3-snapshot" {
+  bucket = "tfe-s3-snapshot"
 
   tags = {
-    Name        = "tfe-s3"
+    Name        = "tfe-s3-snapshot"
     environment = "${var.prefix}-Labs"
   }
 }
-*/
+
 
 ################ ALB ##################
 resource "aws_lb" "tfe-alb" {

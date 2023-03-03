@@ -71,7 +71,7 @@ resource "aws_route_table_association" "PRT-PSN1" {
   route_table_id = aws_route_table.tfe-rt.id
 }
 
-resource "aws_route_table_association" "PRT-PSN1" {
+resource "aws_route_table_association" "PRT-PSN2" {
   subnet_id      = aws_subnet.tfe-subnet2.id
   route_table_id = aws_route_table.tfe-rt.id
 }

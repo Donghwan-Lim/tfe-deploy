@@ -102,13 +102,13 @@ resource "aws_security_group" "tfe-sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
+  /*
   ingress {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
+  }*/
 
   egress {
     from_port       = 443
@@ -117,14 +117,14 @@ resource "aws_security_group" "tfe-sg" {
     cidr_blocks     = ["0.0.0.0/0"]
     #prefix_list_ids = []
   }
-
+   /*
    egress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
     cidr_blocks     = ["0.0.0.0/0"]
     #prefix_list_ids = []
-  }
+  }*/
 
 #KB Capital Security Setting
 /* 
@@ -143,7 +143,7 @@ resource "aws_security_group" "tfe-sg" {
 }
 
 ########EC2 Instance#########
-resource "aws_eip" "tfe-eip" {
+/*resource "aws_eip" "tfe-eip" {
   instance = aws_instance.tfe-server.id
   vpc      = true
   tags = {
@@ -156,7 +156,7 @@ resource "aws_eip_association" "tfe-eip" {
   instance_id   = aws_instance.tfe-server.id
   allocation_id = aws_eip.tfe-eip.id
 }
-
+*/
 # Create Volumes
 resource "aws_ebs_volume" "tfe-vols" {
   availability_zone = aws_subnet.tfe-subnet.availability_zone
@@ -240,6 +240,7 @@ resource "local_file" "ssh_key" {
 #########Command EXEC###########
 
 ####################### S3 ############
+/*
 resource "aws_s3_bucket" "tfe-s3" {
   bucket = "tfe-s3"
 
@@ -247,4 +248,114 @@ resource "aws_s3_bucket" "tfe-s3" {
     Name        = "tfe-s3"
     environment = "${var.prefix}-Labs"
   }
+}
+*/
+
+################ ALB ##################
+resource "aws_lb" "tfe-alb" {
+  name               = "${var.prefix}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [ aws_security_group.tfe-sg.id ]
+  #vpc_security_group_ids = [ aws_security_group.tfe-sg.id ]
+  subnets            = [aws_subnet.tfe-subnet.id, aws_subnet.tfe-subnet2.id]
+
+  enable_deletion_protection = true
+  /*
+  access_logs {
+    bucket  = aws_s3_bucket.lb_logs.id
+    prefix  = "test-lb"
+    enabled = true
+  }
+  */
+  tags = {
+    Name = "${var.prefix}-alb"
+    environment = "${var.prefix}-Labs"
+  }
+}
+
+resource "aws_lb_listener" "alb-listner-443" {
+  load_balancer_arn = aws_lb.tfe-alb.arn
+  port = "443"
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.TG-443.arn
+  }
+}
+
+resource "aws_lb_listener" "alb-listner-8800" {
+  load_balancer_arn = aws_lb.tfe-alb.arn
+  port = "8800"
+  protocol = "HTTPS"
+  ssl_policy = "ELBSecurityPolicy-2016-08"
+  certificate_arn = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.TG-8800.arn
+  }
+}
+
+resource "aws_lb_listener" "alb-listner-80" {
+  load_balancer_arn = aws_lb.tfe-alb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+
+################## TG #################
+resource "aws_lb_target_group" "TG-443" {
+  name = "${var.prefix}-TG-443"
+  port = "443"
+  protocol = "HTTPS"
+  vpc_id = aws_vpc.tfe-vpc.id
+
+  health_check {
+    enabled = true
+    matcher = "200-399"
+    path = "/_health_check"
+    protocol = "HTTPS"
+    port = "443"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "tfe-alb-tg-443" {
+  target_group_arn = aws_lb_target_group.TG-443.arn
+  target_id        = aws_instance.tfe-server.id
+  port             = "443"
+}
+
+resource "aws_lb_target_group" "TG-8800" {
+  name = "${var.prefix}-TG-8800"
+  port = "8800"
+  protocol = "HTTPS"
+  vpc_id = aws_vpc.tfe-vpc.id
+
+  health_check {
+    enabled = true
+    matcher = "200-399"
+    path = "/"
+    protocol = "HTTPS"
+    port = "8800"
+  }
+}
+
+resource "aws_lb_target_group_attachment" "tfe-alb-tg-8800" {
+  target_group_arn = aws_lb_target_group.TG-8800.arn
+  target_id        = aws_instance.tfe-server.id
+  port             = "8800"
 }

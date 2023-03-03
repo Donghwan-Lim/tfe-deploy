@@ -71,6 +71,11 @@ resource "aws_route_table_association" "PRT-PSN1" {
   route_table_id = aws_route_table.tfe-rt.id
 }
 
+resource "aws_route_table_association" "PRT-PSN1" {
+  subnet_id      = aws_subnet.tfe-subnet2.id
+  route_table_id = aws_route_table.tfe-rt.id
+}
+
 resource "aws_security_group" "tfe-sg" {
   name = "${var.prefix}-security-group"
   vpc_id = aws_vpc.tfe-vpc.id
@@ -325,7 +330,7 @@ resource "aws_route53_record" "alb-alias" {
   alias {
     name                   = aws_lb.tfe-alb.dns_name
     zone_id                = aws_lb.tfe-alb.zone_id
-    evaluate_target_health = true
+    evaluate_target_health = false
   }
 }
 

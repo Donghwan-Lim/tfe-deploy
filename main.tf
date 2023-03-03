@@ -122,6 +122,15 @@ resource "aws_security_group" "tfe-sg" {
     cidr_blocks     = ["0.0.0.0/0"]
     #prefix_list_ids = []
   }
+
+  egress {
+    from_port       = 8800
+    to_port         = 8800
+    protocol        = "tcp"
+    cidr_blocks     = ["0.0.0.0/0"]
+    #prefix_list_ids = []
+  }
+
    /*
    egress {
     from_port       = 80

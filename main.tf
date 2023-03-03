@@ -316,6 +316,18 @@ resource "aws_lb_listener" "alb-listner-80" {
   }
 }
 
+#################Route 53 Record###########
+resource "aws_route53_record" "alb-alias" {
+  zone_id = "Z07221033KQJ2V7LHSBCM"
+  name    = "kbcapital.inside-terraform.com"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.tfe-alb.dns_name
+    zone_id                = aws_lb.tfe-alb.zone_id
+    evaluate_target_health = true
+  }
+}
 
 ################## TG #################
 resource "aws_lb_target_group" "TG-443" {

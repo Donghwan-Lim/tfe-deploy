@@ -1,6 +1,6 @@
 terraform {
   cloud {
-    hostname = "app.terraform.io"
+    hostname     = "app.terraform.io"
     organization = "Insideinfo"
     workspaces {
       name = "tfe-deploy"
@@ -13,32 +13,32 @@ provider "aws" {
 }
 
 resource "aws_vpc" "tfe-vpc" {
-  cidr_block = "192.168.10.0/24"
+  cidr_block           = "192.168.10.0/24"
   enable_dns_hostnames = true
   tags = {
-    "Name" = "${var.prefix}-VPC"
+    "Name"      = "${var.prefix}-VPC"
     environment = "${var.prefix}-Labs"
   }
 }
 
 resource "aws_subnet" "tfe-subnet" {
-  vpc_id            = aws_vpc.tfe-vpc.id
-  cidr_block        = "192.168.10.0/25"
-  availability_zone = "${var.region}a"
+  vpc_id                  = aws_vpc.tfe-vpc.id
+  cidr_block              = "192.168.10.0/25"
+  availability_zone       = "${var.region}a"
   map_public_ip_on_launch = true
   tags = {
-    Name = "${var.prefix}-Subnet"
+    Name        = "${var.prefix}-Subnet"
     environment = "${var.prefix}-Labs"
   }
 }
 
 resource "aws_subnet" "tfe-subnet2" {
-  vpc_id            = aws_vpc.tfe-vpc.id
-  cidr_block        = "192.168.10.128/25"
-  availability_zone = "${var.region}c"
+  vpc_id                  = aws_vpc.tfe-vpc.id
+  cidr_block              = "192.168.10.128/25"
+  availability_zone       = "${var.region}c"
   map_public_ip_on_launch = true
   tags = {
-    Name = "${var.prefix}-Subnet-2"
+    Name        = "${var.prefix}-Subnet-2"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -47,7 +47,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.tfe-vpc.id
 
   tags = {
-    Name = "${var.prefix}-internet-gateway"
+    Name        = "${var.prefix}-internet-gateway"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -60,8 +60,8 @@ resource "aws_route_table" "tfe-rt" {
     gateway_id = aws_internet_gateway.igw.id
   }
 
-tags = {
-    Name = "${var.prefix}-Public-RT"
+  tags = {
+    Name        = "${var.prefix}-Public-RT"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -77,7 +77,7 @@ resource "aws_route_table_association" "PRT-PSN2" {
 }
 
 resource "aws_security_group" "tfe-sg" {
-  name = "${var.prefix}-security-group"
+  name   = "${var.prefix}-security-group"
   vpc_id = aws_vpc.tfe-vpc.id
 
   ingress {
@@ -116,22 +116,22 @@ resource "aws_security_group" "tfe-sg" {
   }*/
 
   egress {
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
     #prefix_list_ids = []
   }
 
   egress {
-    from_port       = 8800
-    to_port         = 8800
-    protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 8800
+    to_port     = 8800
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
     #prefix_list_ids = []
   }
 
-   /*
+  /*
    egress {
     from_port       = 80
     to_port         = 80
@@ -140,8 +140,8 @@ resource "aws_security_group" "tfe-sg" {
     #prefix_list_ids = []
   }*/
 
-#KB Capital Security Setting
-/* 
+  #KB Capital Security Setting
+  /* 
   egress {
     from_port       = 443
     to_port         = 443
@@ -151,7 +151,7 @@ resource "aws_security_group" "tfe-sg" {
 */
 
   tags = {
-    Name = "${var.prefix}-security-group"
+    Name        = "${var.prefix}-security-group"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -175,9 +175,9 @@ resource "aws_eip_association" "tfe-eip" {
 resource "aws_ebs_volume" "tfe-vols" {
   availability_zone = aws_subnet.tfe-subnet.availability_zone
   size              = 100
-  type = "gp3"
+  type              = "gp3"
   tags = {
-    Name = "tfe-volumes"
+    Name        = "tfe-volumes"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -193,19 +193,19 @@ resource "aws_instance" "tfe-server" {
 
   ami = "ami-035233c9da2fabf52"
 
-  subnet_id = aws_subnet.tfe-subnet.id
-  instance_type = var.instance_type1
+  subnet_id                   = aws_subnet.tfe-subnet.id
+  instance_type               = var.instance_type1
   associate_public_ip_address = true
   # security_groups = [ aws_security_group.tfe-sg.id]
-  vpc_security_group_ids = [ aws_security_group.tfe-sg.id ]
-  key_name = aws_key_pair.tfe-keypair.key_name
+  vpc_security_group_ids = [aws_security_group.tfe-sg.id]
+  key_name               = aws_key_pair.tfe-keypair.key_name
   root_block_device {
     volume_type = "gp3"
     volume_size = 50
   }
 
   tags = {
-    Name = "${var.prefix}-server"
+    Name        = "${var.prefix}-server"
     environment = "${var.prefix}-Labs"
   }
 }
@@ -216,14 +216,14 @@ resource "tls_private_key" "tfe-priv-key" {
 }
 
 resource "aws_key_pair" "tfe-keypair" {
-  key_name   = "${var.prefix}-keypair"
+  key_name = "${var.prefix}-keypair"
   #public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAxnyAkgOuZKikOax2ZAutclzsG+2geDCUL4FMgoEMrY6qvLDIfV85Hf55gJlZwjzqvcXpg+xdBi4/Zr0kxjzQwlqfn5c4F1XltHs+YFz92ie+KIv++Y4DYhnlea3SrwwyN+eiQu/AKpZWkpAWyJ3Axw4U1RavJKxtlBYPrZXKQ+b4mlpQJopr5lU8jF6Uu61GTNPQ2mN9zQ1QQe93p6dhWyvdirlQ0OW/Hpab6ae+k8HxpoTVre+nuIRS/tBKfD+rNNblXIM2n5Kn4abYzNLyxBTxCJDK+lkUhmuAfC9D9GJR8fbvHaplYhp8/Jz9L0vEZG7/BYq6n8+cRaKNVBwSeQ=="
   public_key = tls_private_key.tfe-priv-key.public_key_openssh
 }
 
 resource "local_file" "ssh_key" {
   filename = "${var.prefix}-keypair.pem"
-  content = tls_private_key.tfe-priv-key.private_key_pem
+  content  = tls_private_key.tfe-priv-key.private_key_pem
 }
 
 #########Command EXEC###########
@@ -270,9 +270,9 @@ resource "aws_lb" "tfe-alb" {
   name               = "${var.prefix}-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [ aws_security_group.tfe-sg.id ]
+  security_groups    = [aws_security_group.tfe-sg.id]
   #vpc_security_group_ids = [ aws_security_group.tfe-sg.id ]
-  subnets            = [aws_subnet.tfe-subnet.id, aws_subnet.tfe-subnet2.id]
+  subnets = [aws_subnet.tfe-subnet.id, aws_subnet.tfe-subnet2.id]
 
   enable_deletion_protection = true
   /*
@@ -283,33 +283,33 @@ resource "aws_lb" "tfe-alb" {
   }
   */
   tags = {
-    Name = "${var.prefix}-alb"
+    Name        = "${var.prefix}-alb"
     environment = "${var.prefix}-Labs"
   }
 }
 
 resource "aws_lb_listener" "alb-listner-443" {
   load_balancer_arn = aws_lb.tfe-alb.arn
-  port = "443"
-  protocol = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.TG-443.arn
   }
 }
 
 resource "aws_lb_listener" "alb-listner-8800" {
   load_balancer_arn = aws_lb.tfe-alb.arn
-  port = "8800"
-  protocol = "HTTPS"
-  ssl_policy = "ELBSecurityPolicy-2016-08"
-  certificate_arn = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
+  port              = "8800"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = "arn:aws:acm:ap-northeast-2:421448405988:certificate/9ae4eb34-7db6-45ca-8a6a-f9e88150c2e7"
 
   default_action {
-    type = "forward"
+    type             = "forward"
     target_group_arn = aws_lb_target_group.TG-8800.arn
   }
 }
@@ -345,17 +345,17 @@ resource "aws_route53_record" "alb-alias" {
 
 ################## TG #################
 resource "aws_lb_target_group" "TG-443" {
-  name = "${var.prefix}-TG-443"
-  port = "443"
+  name     = "${var.prefix}-TG-443"
+  port     = "443"
   protocol = "HTTPS"
-  vpc_id = aws_vpc.tfe-vpc.id
+  vpc_id   = aws_vpc.tfe-vpc.id
 
   health_check {
-    enabled = true
-    matcher = "200-399"
-    path = "/_health_check"
+    enabled  = true
+    matcher  = "200-399"
+    path     = "/_health_check"
     protocol = "HTTPS"
-    port = "443"
+    port     = "443"
   }
 }
 
@@ -366,17 +366,17 @@ resource "aws_lb_target_group_attachment" "tfe-alb-tg-443" {
 }
 
 resource "aws_lb_target_group" "TG-8800" {
-  name = "${var.prefix}-TG-8800"
-  port = "8800"
+  name     = "${var.prefix}-TG-8800"
+  port     = "8800"
   protocol = "HTTPS"
-  vpc_id = aws_vpc.tfe-vpc.id
+  vpc_id   = aws_vpc.tfe-vpc.id
 
   health_check {
-    enabled = true
-    matcher = "200-399"
-    path = "/"
+    enabled  = true
+    matcher  = "200-399"
+    path     = "/"
     protocol = "HTTPS"
-    port = "8800"
+    port     = "8800"
   }
 }
 
